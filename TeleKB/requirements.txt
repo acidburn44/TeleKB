@@ -1,0 +1,4 @@
+telethon
+google-genai
+python-dotenv
+tk

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables (Critical Security)
+.env
+
+# User Data & Database
+telekb.db
+output/
+*.session
+*.session-journal
+
+# IDE settings
+.vscode/
+.idea/
+
+# Build Artifacts (PyInstaller)
+build/
+dist/
+*.spec
+
+# OS Generated
+.DS_Store
+Thumbs.db
