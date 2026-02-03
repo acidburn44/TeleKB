@@ -153,7 +153,9 @@ TeleKB(Telegram Knowledge Base)앱 개발 요구사항을 한 문서로 정리�
 
 ### 6.1 저장 위치
 
-* 모든 Markdown 파일은 **단일 OUTPUT_DIR**에 저장한다(MUST).
+* 모든 Markdown 파일은 **OUTPUT_DIR 하위의 `YYYY-MM` (예: `2026-02`) 디렉토리**에 저장한다(MUST).
+* **폴더명의 기준은 메시지 생성 시간(Local Time)을 따른다.**
+* 해당 디렉토리가 없다면 자동으로 생성해서 저장해야 한다.
 
 ### 6.2 파일명 규칙 (MUST)
 
@@ -173,10 +175,13 @@ TeleKB(Telegram Knowledge Base)앱 개발 요구사항을 한 문서로 정리�
 
 ### 6.5 이미지 처리 (MUST)
 
-* 메시지에 포함된 이미지는 `OUTPUT_DIR/images` 디렉토리에 저장한다.
+### 6.5 이미지 처리 (MUST)
+
+* 메시지에 포함된 이미지는 **Markdown 파일이 저장된 `YYYY-MM` 디렉토리 하위의 `images` 디렉토리**에 저장한다.
+  * 즉, `OUTPUT_DIR/YYYY-MM/images` 위치에 저장된다.
 * 이미지 파일명은 중복 방지를 위해 `{channel_id}_{message_id}.jpg` 형식을 권장한다.
 * Markdown 파일 내에 해당 이미지에 대한 링크를 포함시켜야 한다.
-  * 예: `![Image](images/12345_67890.jpg)`
+  * 예: `![Image](images/12345_67890.jpg)` (같은 폴더 내의 images 폴더이므로 상대 경로 사용)
 
 ### 6.4 파일 내용 (SHOULD)
 

@@ -4,41 +4,47 @@ from .text_utils import TextUtils
 
 class FileManager:
     @staticmethod
+    def get_target_directory_name(message_date: datetime.datetime) -> str:
+        if message_date.tzinfo:
+            local_date = message_date.astimezone()
+        else:
+            local_date = message_date
+        return local_date.strftime("%Y-%m")
+
+    @staticmethod
     def save_markdown(channel_name: str, message_text: str, translated_text: str, 
                       message_id: int, message_date: datetime.datetime, 
                       output_dir: str, is_korean_skipped: bool = False,
                       image_paths: list = None) -> str:
         
-        # 1. Prepare filename
-        first_sentence = TextUtils.get_first_sentence(message_text)
-        sanitized_channel = TextUtils.sanitize_filename(channel_name)[:30] # Max 30
-        sanitized_sentence = TextUtils.sanitize_filename(first_sentence)[:60] # Max 60
-        date_str = message_date.strftime("%Y%m%d")
+        # 1. Prepare filename & directory
+        folder_name = FileManager.get_target_directory_name(message_date)
+        target_dir = os.path.join(output_dir, folder_name)
+        os.makedirs(target_dir, exist_ok=True)
         
-        filename = f"{sanitized_channel}_{sanitized_sentence}_{date_str}.md"
-        filepath = os.path.join(output_dir, filename)
-        
-        # Handle duplicates? Spec doesn't say what if filename exists.
-        # But messages are unique by ID. If filename collision, we might overwrite or append.
-        # Let's just append _1, _2 if exists to be safe, though not explicitly required by spec, 
-        # but 6.1 says "중복 방지...". Wait, "중복 방지 기록을 DB에 남긴다".
-        # If filename collision happens for DIFFERENT messages (same first sentence), we should probably not overwrite.
-        
-        base_name, ext = os.path.splitext(filename)
-        counter = 1
-        while os.path.exists(filepath):
-            filepath = os.path.join(output_dir, f"{base_name}_{counter}{ext}")
-            counter += 1
-            
-        # 2. Prepare content
-        content = f"# {channel_name}\n\n"
-        # Convert to local time if timezone aware, else assume local?
-        # Telethon dates are usually UTC.
+        # Use local date for filename suffix too
         if message_date.tzinfo:
             local_date = message_date.astimezone()
         else:
             local_date = message_date
             
+        first_sentence = TextUtils.get_first_sentence(message_text)
+        sanitized_channel = TextUtils.sanitize_filename(channel_name)[:30] # Max 30
+        sanitized_sentence = TextUtils.sanitize_filename(first_sentence)[:60] # Max 60
+        date_str = local_date.strftime("%Y%m%d")
+        
+        filename = f"{sanitized_channel}_{sanitized_sentence}_{date_str}.md"
+        filepath = os.path.join(target_dir, filename)
+        
+        # Handle duplicates
+        base_name, ext = os.path.splitext(filename)
+        counter = 1
+        while os.path.exists(filepath):
+            filepath = os.path.join(target_dir, f"{base_name}_{counter}{ext}")
+            counter += 1
+            
+        # 2. Prepare content
+        content = f"# {channel_name}\n\n"
         content += f"**Time:** {local_date.strftime('%Y-%m-%d %H:%M:%S')}\n"
         content += f"**Message ID:** {message_id}\n\n"
         content += "---\n\n"
@@ -58,7 +64,7 @@ class FileManager:
             for img_path in image_paths:
                 # Calculate relative path for markdown
                 try:
-                    rel_path = os.path.relpath(img_path, output_dir)
+                    rel_path = os.path.relpath(img_path, target_dir)
                     # Markdown uses forward slashes
                     rel_path = rel_path.replace(os.sep, '/')
                     content += f"![Image]({rel_path})\n\n"

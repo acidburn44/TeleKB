@@ -188,7 +188,10 @@ class MainWindow:
                     
                     image_paths = []
                     if msg.photo:
-                        images_dir = os.path.join(self.output_dir.get(), "images")
+                        # Use same date logic as FileManager
+                        sub_folder = FileManager.get_target_directory_name(msg.date)
+                        images_dir = os.path.join(self.output_dir.get(), sub_folder, "images")
+                        
                         if not os.path.exists(images_dir):
                             os.makedirs(images_dir)
                             
