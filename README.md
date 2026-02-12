@@ -7,7 +7,7 @@ TeleKB is a local GUI application that collects messages from your subscribed Te
 *   **Channel Management**: Easily add or remove (hard delete) channels and groups via a GUI.
 *   **Smart Collection**: Collects only new messages since the last run.
 *   **Auto Translation**: Automatically detects non-Korean messages and translates them to Korean using **Google Gemini**.
-*   **Markdown Export**: Saves messages as `.md` files, preserving original formatting, hyperlinks, and URLs.
+*   **Markdown Export**: Saves messages as `.md` files, preserving original formatting, hyperlinks, and URLs. Messages are consolidated into a single file per channel per day (`channel_YYYYMMDD.md`).
 *   **Duplicate Prevention**: Uses a local SQLite database to prevent saving duplicate messages.
 *   **GUI-based Login**: Convenient Telegram login with a popup dialog for phone number and code entry.
 
@@ -62,7 +62,7 @@ python main.py
 ### 4. Collecting Messages
 *   In the main window, choose an **Output Directory**.
 *   Click **Run Collection**.
-*   The application will fetch new messages, translate them if necessary, and save them as Markdown files in the selected folder.
+*   The application will fetch new messages, translate them if necessary, and save them as Markdown files in the selected folder using a `YYYY-MM` directory structure.
 
 ## Troubleshooting
 
@@ -85,7 +85,7 @@ TeleKB는 구독 중인 텔레그램 채널과 그룹의 메시지를 수집하�
 *   **채널 관리**: GUI를 통해 채널 통계를 확인하고 추가하거나 완전히 삭제(Hard Delete)할 수 있습니다.
 *   **스마트 수집**: 마지막 실행 이후의 새로운 메시지만 수집합니다.
 *   **자동 번역**: 비한국어 메시지를 감지하여 **Google Gemini**로 자동 번역합니다.
-*   **Markdown 내보내기**: 원본 서식, 하이퍼링크, URL을 유지한 채 `.md` 파일로 저장합니다.
+*   **Markdown 내보내기**: 원본 서식, 하이퍼링크, URL을 유지한 채 `.md` 파일로 저장합니다. 메시지는 채널별/일자별로 하나의 파일(`channel_YYYYMMDD.md`)에 통합되어 저장됩니다.
 *   **중복 방지**: 로컬 SQLite 데이터베이스를 사용하여 중복 메시지 저장을 방지합니다.
 *   **GUI 기반 로그인**: 전화번호 및 인증 코드 입력을 위한 팝업 대화상자를 통해 편리하게 로그인할 수 있습니다.
 
@@ -140,7 +140,7 @@ python main.py
 ### 4. 메시지 수집
 *   메인 창에서 **Output Directory**를 선택합니다.
 *   **Run Collection**을 클릭합니다.
-*   앱이 새로운 메시지를 가져와 번역(필요 시)하고, 선택한 폴더에 Markdown 파일로 저장합니다.
+*   앱이 새로운 메시지를 가져와 번역(필요 시)하고, 선택한 폴더 내 `YYYY-MM` 디렉토리에 Markdown 파일로 저장합니다.
 
 ## 문제 해결
 
