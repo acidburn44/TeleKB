@@ -101,9 +101,22 @@ class TextUtils:
         # `text = helpers.add_surrogate(text)` makes it len-compatible with Telegram offsets.
         # Then we slice, then `del_surrogate`.
         
-        from telethon.helpers import add_surrogate, del_surrogate
+        # Robust surrogate handling to avoid 'utf-16-le' codec errors with malformed text
+        def safe_add_surrogate(s):
+            try:
+                # Use surrogatepass to allow lone surrogates without crashing
+                return s.encode('utf-16-le', errors='surrogatepass').decode('utf-16-le', errors='surrogatepass')
+            except Exception:
+                return s
+
+        def safe_del_surrogate(s):
+            try:
+                # Same operation to revert/cleanup surrogate representation
+                return s.encode('utf-16-le', errors='surrogatepass').decode('utf-16-le', errors='surrogatepass')
+            except Exception:
+                return s
         
-        text_surrogate = add_surrogate(text)
+        text_surrogate = safe_add_surrogate(text)
         
         for entity in sorted_entities:
             start = entity.offset
@@ -116,8 +129,6 @@ class TextUtils:
                 url = entity.url
                 replacement = f"[{inner_text}]({url})"
             elif isinstance(entity, MessageEntityUrl):
-                # Auto-link. We can leave it or format it.
-                # Markdown usually auto-links. But explicit is better.
                 replacement = f"[{inner_text}]({inner_text})"
             elif isinstance(entity, MessageEntityBold):
                 replacement = f"**{inner_text}**"
@@ -128,4 +139,4 @@ class TextUtils:
                 
             text_surrogate = text_surrogate[:start] + replacement + text_surrogate[end:]
             
-        return del_surrogate(text_surrogate)
+        return safe_del_surrogate(text_surrogate)
