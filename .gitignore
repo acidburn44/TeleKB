@@ -12,6 +12,7 @@ env/
 
 # User Data & Database
 telekb.db
+settings.json
 output/
 *.session
 *.session-journal
