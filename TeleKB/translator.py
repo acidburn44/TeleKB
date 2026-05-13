@@ -7,7 +7,7 @@ class Translator:
         if Config.GEMINI_API_KEY:
             self.client = genai.Client(api_key=Config.GEMINI_API_KEY)
             # Priority list of models to try. Fall back to older/other versions if quota exceeded.
-            self.model_list = ["models/gemini-3.1-flash-lite-preview", "models/gemini-2.5-flash-lite", "models/gemma-4-31b-it"]
+            self.model_list = ["models/gemini-3.1-flash-lite", "models/gemini-2.5-flash-lite", "models/gemma-4-31b-it"]
         else:
             self.client = None
 
