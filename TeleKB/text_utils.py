@@ -1,5 +1,6 @@
 import re
 import os
+import struct
 from telethon.tl.types import MessageEntityTextUrl, MessageEntityUrl, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre
 
 KEYWORDS = {
@@ -101,18 +102,25 @@ class TextUtils:
         # `text = helpers.add_surrogate(text)` makes it len-compatible with Telegram offsets.
         # Then we slice, then `del_surrogate`.
         
-        # Robust surrogate handling to avoid 'utf-16-le' codec errors with malformed text
+        # Telegram entity offsets are counted in UTF-16 code units. Python strings
+        # index by code point, so a single astral character (e.g. an emoji, U+10000+)
+        # counts as 1 in Python but 2 in Telegram's offsets. We must expand each such
+        # character into its UTF-16 surrogate pair (2 chars) before slicing by offset,
+        # otherwise every entity located after an emoji is off by one (or more).
         def safe_add_surrogate(s):
             try:
-                # Use surrogatepass to allow lone surrogates without crashing
-                return s.encode('utf-16-le', errors='surrogatepass').decode('utf-16-le', errors='surrogatepass')
+                return ''.join(
+                    ''.join(chr(y) for y in struct.unpack('<HH', c.encode('utf-16-le')))
+                    if 0x10000 <= ord(c) <= 0x10FFFF else c
+                    for c in s
+                )
             except Exception:
                 return s
 
         def safe_del_surrogate(s):
             try:
-                # Same operation to revert/cleanup surrogate representation
-                return s.encode('utf-16-le', errors='surrogatepass').decode('utf-16-le', errors='surrogatepass')
+                # Recombine surrogate pairs back into single characters.
+                return s.encode('utf-16-le', 'surrogatepass').decode('utf-16-le', 'surrogatepass')
             except Exception:
                 return s
         
